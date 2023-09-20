@@ -1,0 +1,58 @@
+{% set userData = app.session.get('userData') %} 
+
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">{{ page_title }}</h5>
+</div>
+<div class="modal-body">
+    <div class="card card-primary">
+         <div class="alert alert-danger errors d-none" role="alert" >
+       
+        </div>
+        <div class="alert alert-success success d-none" role="alert" >
+       
+        </div>
+        <div class="card-body">
+            <form id="form">
+                <div class="form-group">
+                    {{ form_label(form.code) }}
+                    {{ form_widget(form.code) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                </div>
+                <div class="card-footer text-right">
+                    <button type="button" class="btn btn-secondary close-modal" data-bs-dismiss="modal">Close</button>
+                    {% if action == 'u' and (userData.type == 'Super Admin' or 'CMS Desease Delete' in userData.accesses) %}
+                        <button type="submit" class="ask-continue btn  btn-danger" name="action" value="d"
+                                data-message="Are you sure you want to delete this record?">Delete</button>
+                    {% endif %}
+                   <button type="submit" class="btn just-continue btn-primary" name="action" value="{{ action }}" data-message="Are you sure you want to save this information?">Submit</button>
+                </div>
+
+                {{ form_widget(form.branch) }}
+                {{ form_widget(form.action) }}
+                {{ form_widget(form.id) }}
+                {{ form_widget(form._token) }}
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% if  javascripts is defined %}
+
+    {% for script in javascripts %}
+        <script src="{{ script }}?v={{ assets_version }}"></script>
+    {% endfor  %}
+{% endif %}
+
+<script language="javascript">
+    //<![CDATA[
+    $(document).ready(function(){
+            desease_ajax_form.settings.processFormUrl = "{{ path('desease_ajax_form_process')}}";
+            desease_ajax_form.init();
+    });
+    //]]>
+</script>

@@ -1,0 +1,219 @@
+{% extends 'content.html.twig' %}
+
+{% block pageContent %}
+    
+    <div class="content-wrapper" style="min-height: 847px;" id="dashboard">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Dashboard</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card card-primary card-outline card-tabs">
+                    {# <div class="card-header p-0 pt-1 border-bottom-0">
+                        <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                            <li class="nav-item">
+                                 <a class="nav-link active" id="custom-tabs-three-home-tab" data-toggle="pill" href="#custom-tabs-three-home" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true"></a>
+                            </li>
+                        </ul>
+                    </div> #}
+                    <div class="card-body">
+                        <div class="tab-content" id="custom-tabs-three-tabContent">
+                            <div class="tab-pane fade show active" id="custom-tabs-three-home" role="tabpanel" aria-labelledby="custom-tabs-three-home-tab">
+                              <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card card-success">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Top 10 Barangay Avail Service</h3>
+                                            </div>
+                                            <div class="card-body"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                                                <canvas id="top-10-barangay" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%; display: block; width: 524px;" width="524" height="400" class="chartjs-render-monitor"></canvas>
+                                            </div>
+
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card card-success">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Client Per Barangay</h3>
+                                            </div>
+                                            <div class="card-body"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                                                <canvas id="client-per-barangay" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%; display: block; width: 524px;" width="524" height="400" class="chartjs-render-monitor"></canvas>
+                                            </div>
+
+                                            
+                                        </div>
+                                    </div>
+                                      <div class="col-md-6">
+                                        <div class="card card-success">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Client Disease</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="chart">
+                                                    <div class="chartjs-size-monitor">
+                                                        <div class="chartjs-size-monitor-expand">
+                                                            <div class=""></div>
+                                                        </div>
+                                                        <div class="chartjs-size-monitor-shrink">
+                                                            <div class=""></div>
+                                                        </div>
+                                                    </div>
+                                                    <canvas id="desease" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%; display: block; width: 1000px;" width="1000" height="400px" class="chartjs-render-monitor"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>     
+                </div>
+            </div>
+        </section>
+    </div>
+
+     {% include 'js.html.twig' %}
+     <script language="javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            var clientPerBarangay = '{{ path("client_barangay_ajax")}}';
+            var clientTopBarangay = '{{ path("client_top_barangay_ajax")}}';
+            var clientPerDesease = '{{ path("client_desease_ajax")}}';
+
+            $.ajax({
+                url: clientPerBarangay,
+                type: 'POST',
+                success: function(r){
+
+                        var donutChartCanvas = document.getElementById('client-per-barangay');
+                        var ctx = donutChartCanvas.getContext('2d');
+                        var donutData        = {
+                        labels: r.data.labels,
+                        datasets: [
+                                {
+                                    data: r.data.ctr,
+                                    backgroundColor : r.data.colors
+
+                                }
+                            ]
+                        }
+                        var donutOptions     = {
+                            maintainAspectRatio : false,
+                            responsive : true,
+                        }
+                        //Create pie or douhnut chart
+                        // You can switch between pie and douhnut using the method below.
+                        var clientPerBarangay = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: donutData,
+                            options: donutOptions
+                        })
+
+                          donutChartCanvas.onclick = function(e) {
+                            var slice = clientPerBarangay.getElementAtEvent(e);
+                            if (!slice.length) return; // return if not clicked on slice
+                            var label = slice[0]._model.label;
+                            window.open(global.settings.url + '/client?q=' + encodeURI(label));
+                        }
+                }
+            });
+
+            $.ajax({
+                url: clientPerDesease,
+                type: 'POST',
+                success: function(r){
+                        var donutChartCanvas = document.getElementById('desease');
+                        var ctx = donutChartCanvas.getContext('2d');
+
+                        var donutData        = {
+                        labels: r.data.labels,
+                        datasets: [
+                                {
+                                    data: r.data.ctr,
+                                    backgroundColor : r.data.colors
+
+                                }
+                            ]
+                        }
+                        var donutOptions     = {
+                            maintainAspectRatio : false,
+                            responsive : true,
+                        }
+
+                        var clientPerDesease = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: donutData,
+                            options: donutOptions
+                        })
+
+                        donutChartCanvas.onclick = function(e) {
+                            var slice = clientPerDesease.getElementAtEvent(e);
+                            if (!slice.length) return; // return if not clicked on slice
+                            var label = slice[0]._model.label;
+                            window.open(global.settings.url + '/client?q=' + encodeURI(label));
+                        }
+                }
+            });
+
+            $.ajax({
+                url: clientTopBarangay,
+                type: 'POST',
+                success: function(r){
+                        var donutChartCanvas = document.getElementById('top-10-barangay');
+                        var ctx = donutChartCanvas.getContext('2d');
+
+                        var donutData        = {
+                        labels: r.data.labels,
+                        datasets: [
+                                {
+                                    data: r.data.ctr,
+                                    backgroundColor : r.data.colors
+
+                                }
+                            ]
+                        }
+                        var donutOptions     = {
+                            maintainAspectRatio : false,
+                            responsive : true,
+                        }
+                        //Create pie or douhnut chart
+                        // You can switch between pie and douhnut using the method below.
+                        var topBarangay = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: donutData,
+                            options: donutOptions
+                        });
+
+                        
+                        donutChartCanvas.onclick = function(e) {
+                            var slice = topBarangay.getElementAtEvent(e);
+                            if (!slice.length) return; // return if not clicked on slice
+                            var label = slice[0]._model.label;
+                            window.open(global.settings.url + '/client?q=' + encodeURI(label));
+                        }
+                }
+            });
+
+              
+        });
+        //]]>
+    </script>
+
+
+{% endblock %}

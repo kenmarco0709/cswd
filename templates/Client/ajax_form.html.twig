@@ -1,0 +1,538 @@
+{% set userData = app.session.get('userData') %} 
+
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">{{ page_title }}</h5>
+</div>
+<div class="modal-body">
+    <div class="card card-primary">
+         <div class="alert alert-danger errors d-none" role="alert" >
+       
+        </div>
+        <div class="alert alert-success success d-none" role="alert" >
+       
+        </div>
+        <div class="card-body">
+            <form id="form">
+                 <div class="card card-primary" >
+                    <div class="card-header">
+                        Case Information
+                    </div>
+                    <div class="card-body"> 
+                         <div class='container-fluid mb-3'>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.intake_date) }}
+                                        {{ form_widget(form.intake_date) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.release_date) }}
+                                        {{ form_widget(form.release_date) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.barangay_desc) }}
+                                        {{ form_widget(form.barangay_desc) }}
+                                        {{ form_widget(form.barangay) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.case_no) }}
+                                        {{ form_widget(form.case_no) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.approve_amount) }}
+                                        {{ form_widget(form.approve_amount) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.worker) }}
+                                        {{ form_widget(form.worker) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                    <div class="form-group">
+                                        {{ form_label(form.encoder_fullname) }}
+                                        {{ form_widget(form.encoder_fullname) }}
+                                        {{ form_widget(form.encoder) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-4'>
+                                     <div class='form-group mt-2'>
+                                        <label class="control-label">Treatment</label>
+                                        {% for child in form.treatment %}
+                                            <div class="form-check">
+                                                <input type="radio" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.treatment.vars.name ~ ']' }}"  class="form-check-input" value="{{ child.vars.label }}" {{ form.treatment.vars.data  == '' and child.vars.value  == 'Chemo and Dialysis' ? 'checked' : (form.treatment.vars.data == child.vars.value ? 'checked' : '') }}>
+                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class='form-group mt-2'>
+                                        <label class="control-label">Assistance Type</label>
+                                        {% for child in form.assistantType %}
+                                            <div class="form-check">
+                                                <input type="checkbox" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.assistantType.vars.name ~ '][' ~ loop.index ~ ']' }}"  data-childelem='client_form_desease_desc' class="form-check-input assistantTypeInput" value="{{ child.vars.label }}" {{ child.vars.value in client.assistanceTypesInArray ? 'checked' : '' }}>
+                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                  
+                                    <div class='form-group mt-2 {{ "AHC" in client.assistanceTypesInArray or "FAM" in client.assistanceTypesInArray ? '' : 'd-none' }}'>
+                                        <div class="form-group">
+                                            {{ form_label(form.desease_desc) }}
+                                            {{ form_widget(form.desease_desc) }}
+                                            {{ form_widget(form.desease) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                             <div class='row'>
+                                <div class='col-12'>
+                                    <div class='form-group mt-2'>
+                                        <label class="control-label">Sector</label>
+                                        <div class='container-fluid'>
+                                            <div class='row'>
+                                                <div class='col-4'>
+                                                    {% set caseTypeKey = 0 %}
+                                                    {% for child in form.caseType %}
+                                                        {% set caseTypeKey =  caseTypeKey + 1 %}
+                                                        {% if loop.index is even %}
+                                                            <div class="form-check">
+                                                                <input type="checkbox" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.caseType.vars.name ~ '][' ~ caseTypeKey ~ ']' }}" class="form-check-input caseTypeInput" data-childelem='client_form_specified_case_type' value="{{ child.vars.label }}"  {{  child.vars.value  in client.getCaseTypesInArray ? 'checked' : '' }}> 
+                                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <div class='col-4'>
+                                                    {% for child in form.caseType %}
+                                                        {% set caseTypeKey =  caseTypeKey + 1 %}
+                                                        {% if loop.index is odd %}
+                                                            <div class="form-check">
+                                                                <input type="checkbox" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.caseType.vars.name ~ '][' ~ caseTypeKey ~ ']' }}"  class="form-check-input caseTypeInput" data-childelem='client_form_specified_case_type' value="{{ child.vars.label }}" {{ child.vars.value  in client.getCaseTypesInArray ? 'checked' : '' }}>
+                                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class='row'>
+                                                <div class='col-4'>&nbsp;</div>
+                                                <div class='col-4'>
+                                                    <div class="form-group {{ 'Others' in client.getCaseTypesInArray  ? '' : 'd-none' }}">
+                                                       <div>
+                                                             {{ form_label(form.specified_case_type) }}
+                                                            {{ form_widget(form.specified_case_type) }}
+                                                       </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-primary" >
+                    <div class="card-header">
+                        Client Information
+                    </div>
+                    <div class="card-body"> 
+                        <div class='container-fluid mb-3'>
+                            <div class='row'>
+                                <div class='col-8'>
+                                    <div class='container-fluid'>
+                                        <div class='row'>
+                                            <div class='col-12'>
+                                                <h5 class='bold'>Client</h5>
+                                            </div>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.first_name) }}
+                                                    {{ form_widget(form.first_name) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.middle_name) }}
+                                                    {{ form_widget(form.middle_name) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.last_name) }}
+                                                    {{ form_widget(form.last_name) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-12'>
+                                                <h5 class='bold'>Patient</h5>
+                                            </div>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.patient_first_name) }}
+                                                    {{ form_widget(form.patient_first_name) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.patient_middle_name) }}
+                                                    {{ form_widget(form.patient_middle_name) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.patient_last_name) }}
+                                                    {{ form_widget(form.patient_last_name) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-5'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.barangay_address_desc) }}
+                                                    {{ form_widget(form.barangay_address_desc) }}
+                                                    {{ form_widget(form.barangay_address) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-5'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.birth_place) }}
+                                                    {{ form_widget(form.birth_place) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.birth_date) }}
+                                                    {{ form_widget(form.birth_date) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-3'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.educational_attainment) }}
+                                                    {{ form_widget(form.educational_attainment) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                                <div class='col-4'>
+                                    <div class='container-fluid'>
+                                        <div class='row'>
+                                            <div class='col-12'>
+                                                <div class='form-group mt-2'>
+                                                    <label class="control-label">Gender</label>
+                                                    {% for child in form.gender %}
+                                                        <div class="form-check">
+                                                            <input type="radio" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.gender.vars.name ~ ']' }}"  class="form-check-input" value="{{ child.vars.label }}" {{ form.gender.vars.data == child.vars.value ? 'checked' : '' }}>
+                                                            <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class='row'>
+                                            <div class='col-4'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.civil_status) }}
+                                                    {{ form_widget(form.civil_status) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-4'>
+                                                <div class="form-group {{ client.civilstatus == 'Others' ? '' : 'd-none' }}">
+                                                    {{ form_label(form.specified_civil_status) }}
+                                                    {{ form_widget(form.specified_civil_status) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-12'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.relation_to_patient) }}
+                                                    {{ form_widget(form.relation_to_patient) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-12'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.occupation) }}
+                                                    {{ form_widget(form.occupation) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-12'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.income) }}
+                                                    {{ form_widget(form.income) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class='row'>
+                                            <div class='col-12'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.religion) }}
+                                                    {{ form_widget(form.religion) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-12'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.contact_no) }}
+                                                    {{ form_widget(form.contact_no) }}
+                                                </div>
+                                            </div>
+                                            <div class='col-12'>
+                                                <div class="form-group">
+                                                    {{ form_label(form.years_from_current_city) }}
+                                                    {{ form_widget(form.years_from_current_city) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-primary" >
+                    <div class="card-header">
+                        Family Composition
+                    </div>
+                    <div class='card-body'>
+                        <div class='container-fluid'>
+                            <div class='row'>
+                                <div class='col-12'>
+                                    <div class='row'>
+                                        <div class='col-12'>
+                                            <div class='text-right'>
+                                                <a href="javascript:void(0);" class="href-add" data-target="familyTable">Add Family Member</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='row'>
+                                        <div class='col-12'>
+                                            <table width="100%" id="familyTable" class='table table-bordered' style='text-align:center;'>
+                                                <thead>
+                                                    <tr>
+                                                        <td><strong>Fist Name</strong></td>
+                                                        <td><strong>Middle Name</strong></td>
+                                                        <td><strong>Last Name</strong></td>
+                                                        <td><strong>Gender</strong></td>
+                                                        <td><strong>Rel. To Patient</strong></td>
+                                                        <td><strong>Age</strong></td>
+                                                        <td><strong>Civil Status</strong></td>
+                                                        <td><strong>Educ. Attnmt.</strong></td>
+                                                        <td><strong>Occupation</strong></td>
+                                                        <td><strong>Monthly Income</strong></td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for k, family in client.clientFamilies %}
+                                                       {% if not family.isdeleted %}
+                                                            <tr>
+                                                            
+                                                                <td>
+                                                                    <a class="remove float-left" href="javascript:void(0);"/>
+                                                                        <i style="color:red;margin-right:5px;" class="fa fa-times" aria-hidden="true"></i>
+                                                                    </a>
+                                                                    <input style="width:85%;" type="text" class="form-control" name="client_form[familyMember][{{k}}][firstName]" value="{{ family.firstname}}"/>
+                                                                    <input type="hidden" class="form-control" name="client_form[familyMember][{{k}}][client_family_id]" value="{{ family.idencoded}}"/>
+                                                                     <input type="hidden" class="form-control" name="client_form[client_family_ids][{{k}}]" value="{{ family.idencoded}}"/>
+
+                                                                </td>           
+                                                                <td><input type="text" class="form-control" name="client_form[familyMember][{{k}}][middleName]" value="{{ family.middlename}}" /></td>
+                                                                <td><input type="text" class="form-control" name="client_form[familyMember][{{k}}][lastName]" value="{{ family.lastname}}" /></td>
+                                                                <td>
+                                                                    <select class="form-control" name="client_form[familyMember][{{k}}][gender]" />
+                                                                        {% for i in formChoicesInarray['genders'] %}
+                                                                            <option value='{{ i }}' {{ i == family.gender ? 'selected' : ''}}>{{i}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <select class="form-control" name="client_form[familyMember][{{k}}][familyRole]" />
+                                                                        {% for i in formChoicesInarray['patientRelationships'] %}
+                                                                            <option value='{{ i }}' {{ i == family.familyRole ? 'selected' : ''}}>{{i}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </td>
+                                                                <td><input type="text" class="form-control" name="client_form[familyMember][{{k}}][age]" value="{{ family.age}}" /></td>
+                                                                <td>
+                                                                    <select class="form-control" name="client_form[familyMember][{{k}}][civilStatus]" />
+                                                                        {% for i in formChoicesInarray['civilStatuses'] %}
+                                                                            <option value='{{ i }}' {{ i == family.civilStatus ? 'selected' : ''}}>{{i}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <select class="form-control" name="client_form[familyMember][{{k}}][educationalAttainment]" />
+                                                                        {% for i in formChoicesInarray['educationalAttainments'] %}
+                                                                            <option value='{{ i }}' {{ i == family.educationAttainment ? 'selected' : ''}}>{{i}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </td>
+                                                                <td><input type="text" class="form-control" name="client_form[familyMember][{{k}}][occupation]" value="{{ family.occupation}}" /></td>
+                                                                <td><input type="text" class="form-control" name="client_form[familyMember][{{k}}][monthlyIncome]" value="{{ family.monthlyIncome}}" /></td>
+                                                            </tr>
+                                                       {% endif %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-primary" >
+                    <div class="card-header">
+                        Problem Presented
+                    </div>
+                    <div class="card-body"> 
+                        <div class='container-fluid mb-3'>
+                            <div class='row'>
+                                <div class='col-12'>
+                                    <div class="form-group">
+                                        {{ form_widget(form.problem_presented) }}
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-primary" >
+                    <div class="card-header">
+                        Background Information
+                    </div>
+                    <div class="card-body"> 
+                        <div class='container-fluid mb-3'>
+                            <div class='row'>
+                                <div class='col-12'>
+                                    <h6> Housing and Other Living Condition:</h6>
+                                    <div class='form-group form-check-inline mt-2'>
+                                        <label class="control-label">1. Housing:</label>
+                                        {% for child in form.housing %}
+                                            <div class="form-check">
+                                                <input type="radio" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.housing.vars.name ~ ']' }}"  class="form-check-input" value="{{ child.vars.label }}" {{ form.housing.vars.data == child.vars.value ? 'checked' : '' }}>
+                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>  
+                                <div class='col-12'>
+                                    <div class='form-group form-check-inline mt-2'>
+                                        <label class="control-label">2. Housing Structure:</label>
+                                        {% for child in form.housing_structure %}
+                                            <div class="form-check">
+                                                <input type="radio" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.housing_structure.vars.name ~ ']' }}"  class="form-check-input" value="{{ child.vars.label }}" {{ form.housing_structure.vars.data == child.vars.value ? 'checked' : '' }}>
+                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div> 
+                                <div class='col-12'>
+                                    <div class='form-group form-check-inline mt-2'>
+                                        <label class="control-label">3. Lot:</label>
+                                        {% for child in form.lot %}
+                                            <div class="form-check">
+                                                <input type="radio" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.lot.vars.name ~ ']' }}"  class="form-check-input" value="{{ child.vars.label }}" {{ form.lot.vars.data == child.vars.value ? 'checked' : '' }}>
+                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>  
+                                <div class='col-12'>
+                                    <div class='form-group form-check-inline mt-2'>
+                                        <label class="control-label">4. Lighting:</label>
+                                        {% for child in form.lightning %}
+                                            <div class="form-check">
+                                                <input type="checkbox" id="{{ child.vars.id }}" name="{{ form.vars.id ~ '[' ~ form.lightning.vars.name ~ '][' ~ loop.index ~ ']' }}" class="form-check-input" value="{{ child.vars.label }}" {{ child.vars.value in  client.lightingsInArray ? 'checked' : '' }}>
+                                                <label for="{{ child.vars.id }}" class="form-check-label">{{ child.vars.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               
+                
+          
+                <div class="card-footer text-right">
+                    <button type="button" class="btn btn-secondary close-modal" data-bs-dismiss="modal">Close</button>
+                    {% if action == 'u' and (userData.type == 'Super Admin' or 'Client Delete' in userData.accesses) %}
+                        <button type="submit" class="ask-continue btn  btn-danger" name="action" value="d"
+                                data-message="Are you sure you want to delete this record?"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
+                    {% endif %}
+                    <button type="submit" class="btn just-continue btn-primary" name="action" value="{{ action }}" data-message="Are you sure you want to save this information?">Submit</button>
+                </div>
+                {{ form_widget(form.branch) }}
+                {{ form_widget(form.action) }}
+                {{ form_widget(form.id) }}
+                {{ form_widget(form._token) }}
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% if  javascripts is defined %}
+
+    {% for script in javascripts %}
+        <script src="{{ script }}?v={{ assets_version }}"></script>
+    {% endfor  %}
+{% endif %}
+
+<script language="javascript">
+    //<![CDATA[
+    $(document).ready(function(){
+
+            global.init();
+            client_ajax_form.settings.formChoices = {{ formChoices|raw}};
+            client_ajax_form.settings.processFormUrl = "{{ path('client_ajax_form_process')}}";
+            client_ajax_form.settings.barangayAutocompleteUrl = "{{ path('barangay_autocomplete')}}";
+            client_ajax_form.settings.deseaseAutocompleteUrl = "{{ path('desease_autocomplete')}}";
+            client_ajax_form.settings.encoderAutocompleteUrl = "{{ path('user_encoder_autocomplete')}}";
+            client_ajax_form.init();
+    });
+    //]]>
+</script>
